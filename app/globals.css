@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ch-yellow: #FFFF76;
+  --ch-dark: #1A1A1A;
+  --ch-darker: #141414;
+}
+
+@layer components {
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+html, body { overflow: hidden; }
+
+
+body {
+  background-color: var(--ch-dark);
+  color: white;
+}
