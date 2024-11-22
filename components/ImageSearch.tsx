@@ -113,7 +113,7 @@ export default function ImageSearch({ timestampMax }: { timestampMax: Date | und
 
     useEffect(() => {
         if (!imageData) return
-        
+
         setLoading(true);
         setAllTimesSimilarImages([]);
         setRecentSimilarImages([]);
@@ -134,7 +134,7 @@ export default function ImageSearch({ timestampMax }: { timestampMax: Date | und
     };
 
     return (
-        <div className="relative h-full overflow-y-auto">
+        <div className="overflow-y-auto h-[calc(80vh-theme(spacing.16))]">
             <div className="space-y-4">
                 <div className="flex gap-2">
                        Image upload<Icon name="upload" />
@@ -149,7 +149,7 @@ export default function ImageSearch({ timestampMax }: { timestampMax: Date | und
                         }
                     </div>
                 </div>
-                <div className="w-full">
+                <div className="w-full h-40">
                     {!referenceImage && defaultImageUrl && (
                         <img
                             src={defaultImageUrl}
@@ -167,9 +167,9 @@ export default function ImageSearch({ timestampMax }: { timestampMax: Date | und
                     )}
                 </div>
                 <div>
-                    <div className="overflow-y-auto border border-[#696E79] rounded-lg p-2 mb-4">
+                    <div className="border border-[#696E79] rounded-lg p-2 mb-4">
                         <div className="mb-2 text-sm">Most similar images (all time)</div>
-                        <div className="grid grid-cols-3">
+                        <div className="grid grid-cols-3 h-42">
                             {allTimesSimilarImages.map((image, index) => (
                                 <div
                                     key={index}
@@ -177,23 +177,24 @@ export default function ImageSearch({ timestampMax }: { timestampMax: Date | und
                                     <img
                                         src={'data:image/jpeg;base64, ' + image.base64_data}
                                         alt={`Similar image ${index}`}
-                                        className="object-scale-down w-full p-2 h-40"
+                                        className="object-contain w-full p-2 h-40"
                                     />
                                 </div>
                             ))}
                         </div>
                     </div>
-                    <div className="overflow-y-auto border border-[#696E79] rounded-lg p-2">
+                    <div className="border border-[#696E79] rounded-lg p-2">
                         <div className="mb-2 text-sm">Most similar images (Last 10 minutes)</div>
-                        <div className="grid grid-cols-3 gap-2 ">
+                        <div className="grid grid-cols-3 gap-2 h-42">
                             {recentSimilarImages.map((image, index) => (
                                 <div
                                     key={index}
+
                                 >
                                     <img
                                         src={'data:image/jpeg;base64, ' + image.base64_data}
                                         alt={`Similar image ${index}`}
-                                         className="object-scale-down w-full p-2 h-40"
+                                        className="object-contain w-full p-2 h-40"
                                     />
                                 </div>
                             ))}
