@@ -16,7 +16,7 @@ export default function ImageSearch({ timestampMax }: { timestampMax: Date | und
     const [referenceImage, setReferenceImage] = useState<string | null>(null)
     const [allTimesSimilarImages, setAllTimesSimilarImages] = useState<SimilarImage[]>([]);
     const [recentSimilarImages, setRecentSimilarImages] = useState<SimilarImage[]>([]);
-    const [embedding, setEmbedding] = useState(null);
+    const [imageData, setImageData] = useState<string>();
     const [loading, setLoading] = useState(false);
     const [timeWindow, setTimeWindow] = useState<number>(10)
     const defaultImageUrl = "default-dog.jpg"
@@ -29,9 +29,7 @@ export default function ImageSearch({ timestampMax }: { timestampMax: Date | und
             const base64Image = await convertToBase64(file);
             // Remove the "data:image/jpeg;base64," prefix
             const base64String = base64Image.split(',')[1];
-            console.log("base64String: ", base64String)
-            const resultEmbedding = await generateEmbedding(base64String)
-            setEmbedding(resultEmbedding);
+            setImageData(base64String);
             setReferenceImage(URL.createObjectURL(file));
         } catch (error) {
             console.error('Error:', error);
@@ -55,8 +53,7 @@ export default function ImageSearch({ timestampMax }: { timestampMax: Date | und
             const blob = await response.blob();
             const base64 = await convertToBase64(blob);
             const base64String = base64.split(',')[1];
-            const resultEmbedding = await generateEmbedding(base64String);
-            setEmbedding(resultEmbedding);
+            setImageData(base64String);
         };
         fetchDefaultImage();
     }, [])
@@ -75,7 +72,7 @@ export default function ImageSearch({ timestampMax }: { timestampMax: Date | und
         try {
             const response = await fetch('/api/images/search', {
                 method: 'POST',
-                body: JSON.stringify({ vectorData: embedding }),
+                body: JSON.stringify({ base64Data: imageData  }),
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -96,7 +93,7 @@ export default function ImageSearch({ timestampMax }: { timestampMax: Date | und
         try {
             const response = await fetch(`/api/images/search?timestamp_min=${getTimestampMin()}&timestamp_max=${timestampMax?.toISOString()}`, {
                 method: 'POST',
-                body: JSON.stringify({ vectorData: embedding }),
+                body: JSON.stringify({ base64Data: imageData }),
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -114,20 +111,9 @@ export default function ImageSearch({ timestampMax }: { timestampMax: Date | und
         }
     }
 
-    const generateEmbedding = async (base64String: string) => {
-        const responseEmbedding = await fetch('http://localhost:8000/get-embedding', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ base64_image: base64String }),
-        })
-        const dataEmbedding = await responseEmbedding.json();
-        return dataEmbedding.embedding
-    }
-
     useEffect(() => {
-        if (!embedding) return
+        if (!imageData) return
+        
         setLoading(true);
         setAllTimesSimilarImages([]);
         setRecentSimilarImages([]);
@@ -136,7 +122,7 @@ export default function ImageSearch({ timestampMax }: { timestampMax: Date | und
             fetchRecentSimilarImages();
         }
         setLoading(false);
-    }, [embedding])
+    }, [imageData])
 
     const convertToBase64 = (file: File | Blob): Promise<string> => {
         return new Promise((resolve, reject) => {

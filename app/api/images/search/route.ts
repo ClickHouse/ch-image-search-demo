@@ -2,8 +2,22 @@ import { NextResponse } from 'next/server'
 import clickhouse from '@/utils/clickhouse'
 
 export async function POST(request: Request) {
+
+    const generateEmbedding = async (base64String: string) => {
+        const responseEmbedding = await fetch('http://localhost:8000/get-embedding', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ base64_image: base64String }),
+        })
+        const dataEmbedding = await responseEmbedding.json();
+        return dataEmbedding.embedding
+    }
+
     try {
-        const { vectorData } = await request.json()
+        const { base64Data } = await request.json()
+        const vectorData = await generateEmbedding(base64Data)
         const { searchParams } = new URL(request.url)
         const timestampMin = searchParams.get('timestamp_min')
         const timestampMax = searchParams.get('timestamp_max')
