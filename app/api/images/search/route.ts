@@ -10,13 +10,14 @@ export async function POST(request: Request) {
 
         // Convert the vector data to a string format that ClickHouse can understand
         const vectorString = `[${vectorData.join(',')}]`
+        console.log(timestampMin, timestampMax)
         if (timestampMin != null && timestampMax != null) {
             const result = await clickhouse.query({
                 query: `
             SELECT id, base64_data, L2Distance(image_embedding, ${vectorString}) as score
             FROM social_posts_with_images WHERE similarity >= 0.2 and timestamp > parseDateTimeBestEffort({timestampMin:String}) and timestamp < parseDateTimeBestEffort({timestampMax:String})
             ORDER BY score ASC
-            LIMIT 4
+            LIMIT 3
             SETTINGS enable_analyzer = 1
         `,
                 format: 'JSONEachRow',
@@ -33,7 +34,7 @@ export async function POST(request: Request) {
                 SELECT id, base64_data, L2Distance(image_embedding, ${vectorString}) as score
                 FROM social_posts_with_images WHERE similarity >= 0.2
                 ORDER BY score ASC
-                LIMIT 4
+                LIMIT 3
                 SETTINGS enable_analyzer = 0
             `,
                 format: 'JSONEachRow',

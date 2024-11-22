@@ -1,4 +1,4 @@
-'use client'
+"use client"
 
 import { useEffect, useRef, useState } from 'react'
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -60,7 +60,7 @@ export default function ImageStream({ setTimestampMax }: { setTimestampMax: (tim
                 next={() => updatePageIndex((pageIndex) => pageIndex + 1)}
                 hasMore={true}
                 loader={''}
-                className="h-full"
+                className="h-full "
             >
                 <div className="grid grid-cols-4 gap-4 absolute w-full bottom-0">
                     {galleryImages.map((image, index) => (

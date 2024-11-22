@@ -8,6 +8,10 @@
   --ch-darker: #141414;
 }
 
+.isolate {
+  background-image: url('/dot_grid.svg');
+}
+
 @layer components {
   .no-scrollbar {
     -ms-overflow-style: none;

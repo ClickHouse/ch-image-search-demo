@@ -8,7 +8,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <main className="container mx-auto p-4">
+        <main className="isolate">
           {children}
         </main>
       </body>
