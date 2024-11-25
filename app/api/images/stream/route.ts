@@ -19,7 +19,7 @@ export async function GET(request: Request) {
                 FROM social_posts_with_images
                 WHERE timestamp > {timestamp:String} and height > 100 and width > 200
                 ORDER BY timestamp ASC
-                LIMIT 10
+                LIMIT 100
             `,
             format: 'JSONEachRow',
             query_params: {
