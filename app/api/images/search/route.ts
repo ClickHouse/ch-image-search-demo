@@ -36,7 +36,7 @@ export async function POST(request: Request) {
             const result = await clickhouse.query({
                 query: `
                 SELECT id, base64_data, L2Distance(image_embedding, ${vectorString}) as score
-                FROM social_posts_with_images WHERE similarity >= 0.2
+                FROM social_posts_with_images WHERE similarity >= 0.1
                 ORDER BY score ASC
                 LIMIT 3
                 SETTINGS enable_analyzer = 0

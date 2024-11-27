@@ -1,0 +1,20 @@
+export const referenceImages = [
+  "reference_images/image-1.jpg",
+  "reference_images/image-11.jpg",
+  "reference_images/image-13.webp",
+  "reference_images/image-15.jpg",
+  "reference_images/image-17.jpg",
+  "reference_images/image-2.jpg",
+  "reference_images/image-4.jpg",
+  "reference_images/image-6.jpg",
+  "reference_images/image-8.jpg",
+  "reference_images/image-10.jpg",
+  "reference_images/image-12.jpg",
+  "reference_images/image-14.jpg",
+  "reference_images/image-16.jpg",
+  "reference_images/image-18.jpg",
+  "reference_images/image-3.jpg",
+  "reference_images/image-5.jpg",
+  "reference_images/image-7.webp",
+  "reference_images/image-9.webp"
+]
