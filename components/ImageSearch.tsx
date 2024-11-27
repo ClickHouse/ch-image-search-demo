@@ -17,6 +17,7 @@ export default function ImageSearch({ timestampMax }: { timestampMax: Date | und
     const [allTimesSimilarImages, setAllTimesSimilarImages] = useState<SimilarImage[]>([]);
     const [recentSimilarImages, setRecentSimilarImages] = useState<SimilarImage[]>([]);
     const [imageData, setImageData] = useState<string>();
+    const [vectorData, setVectorData] = useState<number[]>([]);
     const [loading, setLoading] = useState(false);
     const [timeWindow, setTimeWindow] = useState<number>(10)
     const defaultImageUrl = "default-dog.jpg"
@@ -54,9 +55,16 @@ export default function ImageSearch({ timestampMax }: { timestampMax: Date | und
             const base64 = await convertToBase64(blob);
             const base64String = base64.split(',')[1];
             setImageData(base64String);
+            
         };
         fetchDefaultImage();
     }, [])
+
+
+    useEffect(() => {
+        if (!imageData) return
+        fetchVectorData();
+    }, [imageData])
 
     useEffect(() => {
         if (!timestampMax) return
@@ -68,11 +76,26 @@ export default function ImageSearch({ timestampMax }: { timestampMax: Date | und
         }
     }, [timestampMax])
 
+    const fetchVectorData = async () => {
+        const response = await fetch('/api/images/embedding', {
+            method: 'POST',
+            body: JSON.stringify({ base64Data: imageData  }),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        } 
+        const data = await response.json();
+        setVectorData(data);
+    }
+
     const fetchAllTimesSimilarImages = async () => {
         try {
             const response = await fetch('/api/images/search', {
                 method: 'POST',
-                body: JSON.stringify({ base64Data: imageData  }),
+                body: JSON.stringify({ vectorData: vectorData  }),
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -93,7 +116,7 @@ export default function ImageSearch({ timestampMax }: { timestampMax: Date | und
         try {
             const response = await fetch(`/api/images/search?timestamp_min=${getTimestampMin()}&timestamp_max=${timestampMax?.toISOString()}`, {
                 method: 'POST',
-                body: JSON.stringify({ base64Data: imageData }),
+                body: JSON.stringify({ vectorData: vectorData }),
                 headers: {
                     'Content-Type': 'application/json',
                 },
@@ -112,7 +135,7 @@ export default function ImageSearch({ timestampMax }: { timestampMax: Date | und
     }
 
     useEffect(() => {
-        if (!imageData) return
+        if (!vectorData) return
 
         setLoading(true);
         setAllTimesSimilarImages([]);
@@ -122,7 +145,7 @@ export default function ImageSearch({ timestampMax }: { timestampMax: Date | und
             fetchRecentSimilarImages();
         }
         setLoading(false);
-    }, [imageData])
+    }, [vectorData])
 
     const convertToBase64 = (file: File | Blob): Promise<string> => {
         return new Promise((resolve, reject) => {

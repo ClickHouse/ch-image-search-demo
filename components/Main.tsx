@@ -4,6 +4,8 @@ import ImageStream from './ImageStream'
 import ImageSearch from './ImageSearch'
 import { useState } from 'react'
 import { ClickUIProvider, ThemeName } from '@clickhouse/click-ui'
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 export default function Main() {
 
