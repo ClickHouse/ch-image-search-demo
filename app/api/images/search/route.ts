@@ -10,10 +10,11 @@ export async function POST(request: Request) {
         const { searchParams } = new URL(request.url)
         const timestampMin = searchParams.get('timestamp_min')
         const timestampMax = searchParams.get('timestamp_max')
-
+        if (vectorData.length === 0) {
+            return NextResponse.json({ error: 'No vector data provided' }, { status: 400 })
+        }
         // Convert the vector data to a string format that ClickHouse can understand
         const vectorString = `[${vectorData.join(',')}]`
-        console.log(timestampMin, timestampMax)
         if (timestampMin != null && timestampMax != null) {
             const result = await clickhouse.query({
                 query: `
