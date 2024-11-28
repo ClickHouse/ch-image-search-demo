@@ -40,6 +40,7 @@ export async function POST(request: Request) {
                 ORDER BY score ASC
                 LIMIT 3
                 SETTINGS enable_analyzer = 0
+                SETTINGS use_query_cache = true
             `,
                 format: 'JSONEachRow',
             })
