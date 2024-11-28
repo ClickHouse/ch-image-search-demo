@@ -23,9 +23,6 @@ const AnimatedRow = ({ children, style }: {
         <div
             style={{
                 ...style,
-                // opacity: isVisible ? 1 : 0,
-                // transform: `translateY(${isVisible ? '0' : '-100%'})`,
-                // transition: `all ${SCROLL_DURATION}ms linear`,
             }}
         >
             {children}
@@ -38,8 +35,7 @@ export default function ImageStream({ setTimestampMax }: { setTimestampMax: (tim
     const [currentIndex, setCurrentIndex] = useState(0);
     const [hasMore, setHasMore] = useState(true);
     const intervalRef = useRef<NodeJS.Timeout | null>(null);
-    const [currentTimestamp, setCurrentTimestamp] = useState<string>('2023-11-12 10:29:00')
-    const lastTimestampRef = useRef(currentTimestamp)
+    const [currentTimestamp, setCurrentTimestamp] = useState<string>()
     const didInit = useRef(false)
     const IMAGE_WIDTH = 800;
     const [scrollTop, setScrollTop] = useState(0);
@@ -47,14 +43,17 @@ export default function ImageStream({ setTimestampMax }: { setTimestampMax: (tim
     const [isLoading, setIsLoading] = useState(false)
 
     const fetchImages = async () => {
-    
         try {
-
             setIsLoading(true)
-            const response = await fetch(`/api/images/stream?timestamp=${lastTimestampRef.current}`);
+            let timestamp = currentTimestamp
+            if (!timestamp) {
+                const response = await fetch(`/api/time`);
+                const data = await response.json();   
+                timestamp = data[0].timestamp 
+            }
+            const response = await fetch(`/api/images/stream?timestamp=${timestamp}`);
             const data = await response.json();
             const newTimestamp = data[data.length - 1].timestamp
-            lastTimestampRef.current = newTimestamp
             setTimestampMax(new Date(newTimestamp))
             setCurrentTimestamp(newTimestamp)
             setImages((prev) => [...prev, ...data]);
@@ -63,9 +62,22 @@ export default function ImageStream({ setTimestampMax }: { setTimestampMax: (tim
         } catch (error) {
             console.error("Error fetching images:", error);
         }
-
-
     }
+
+    const fetchRandomTimestamp = async () => {
+        try {
+            
+            const response = await fetch(`/api/time`);
+            const data = await response.json();   
+            setCurrentTimestamp(data[0].timestamp)
+        } catch (error) {
+            console.error("Error fetching images:", error);
+        }
+    }
+
+    useEffect(() => {
+        console.log("currentTimestamp", currentTimestamp)
+    }, [currentTimestamp])
 
 
     const isRowLoaded = ({ index }: { index: number }) => {
@@ -119,36 +131,16 @@ export default function ImageStream({ setTimestampMax }: { setTimestampMax: (tim
 
     // Modify the auto-scroll logic to use smooth scrolling
     const startAutoScroll = useCallback(() => {
-        console.log("startAutoScroll", isLoading)
         const animate = () => {
-
             setScrollTop(prev => {
                 const newScrollTop = prev + SCROLL_SPEED;
-
-                // Update the currentIndex for animation purposes
-                // setCurrentIndex(Math.floor(newScrollTop / ROW_HEIGHT));
-
                 return newScrollTop;
             });
-
             animationFrameRef.current = requestAnimationFrame(animate);
         };
-
        requestAnimationFrame(animate);
     }, []);
 
-    useEffect(() => {
-        console.log("currentIndex", currentIndex)
-    }, [currentIndex])
-
-    // // Add scroll event handlers
-    // const handleMouseEnter = () => {
-    //     stopAutoScroll();
-    // };
-
-    // const handleMouseLeave = () => {
-    //     startAutoScroll();
-    // };
 
     const stopAutoScroll = () => {
         if (animationFrameRef.current) {
@@ -157,24 +149,23 @@ export default function ImageStream({ setTimestampMax }: { setTimestampMax: (tim
     };
 
     useEffect(() => {
-        // console.log("didInit", didInit.current)
-        if (!didInit.current) {
-
-            fetchImages();
-            startAutoScroll();
-            didInit.current = true;
-
-        }
+        const initializeStream = async () => {
+            if (!didInit.current) {
+                // await fetchRandomTimestamp();
+                await fetchImages();
+                startAutoScroll();
+                didInit.current = true;
+            }
+        };
+        initializeStream();
         return stopAutoScroll; // Cleanup on unmount
     }, []);
+
 
     return (
         <div
             className="relative w-[800px] h-full overflow-hidden mx-auto"
-        // onMouseEnter={handleMouseEnter}
-        // onMouseLeave={handleMouseLeave}
         >
-
             <InfiniteLoader
                 isRowLoaded={isRowLoaded}
                 loadMoreRows={loadMoreRows}
@@ -198,6 +189,5 @@ export default function ImageStream({ setTimestampMax }: { setTimestampMax: (tim
                 )}
             </InfiniteLoader>
         </div>
-
     );
 }

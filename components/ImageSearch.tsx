@@ -103,8 +103,6 @@ export default function ImageSearch({ timestampMax }: { timestampMax: Date | und
 
     const fetchRecentSimilarImages = async () => {
         try {
-
-            console.log("recent images")
             const response = await fetch(`/api/images/search?timestamp_min=${getTimestampMin()}&timestamp_max=${timestampMax?.toISOString()}`, {
                 method: 'POST',
                 body: JSON.stringify({ vectorData: vectorData }),
@@ -137,7 +135,6 @@ export default function ImageSearch({ timestampMax }: { timestampMax: Date | und
     };
 
     useEffect(() => {
-        console.log("fetching default image")
         setLoadingRecent(true);
         setLoadingAllTimes(true);
         fetchDefaultImage();
