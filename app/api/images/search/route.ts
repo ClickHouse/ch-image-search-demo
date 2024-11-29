@@ -41,6 +41,7 @@ export async function POST(request: Request) {
                 LIMIT 3
                 SETTINGS enable_analyzer = 0
                 SETTINGS use_query_cache = true
+                SETTINGS query_cache_ttl = 28800
             `,
                 format: 'JSONEachRow',
             })
