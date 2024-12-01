@@ -9,7 +9,8 @@ interface StreamedImage {
     base64_data: string
 }
 
-const SCROLL_SPEED = 10; // Pixels per frame
+
+
 const ROW_HEIGHT = 400;
 const IMAGES_PER_ROW = 4;
 
@@ -30,7 +31,13 @@ const AnimatedRow = ({ children, style }: {
     );
 };
 
-export default function ImageStream({ setTimestampMax }: { setTimestampMax: (timestamp: Date) => void }) {
+export default function ImageStream({ 
+    setTimestampMax, 
+    scrollSpeed
+}: { 
+    setTimestampMax: (timestamp: Date) => void;
+    scrollSpeed?: number;
+}) {
     const [images, setImages] = useState<StreamedImage[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [hasMore, setHasMore] = useState(true);
@@ -41,6 +48,8 @@ export default function ImageStream({ setTimestampMax }: { setTimestampMax: (tim
     const [scrollTop, setScrollTop] = useState(0);
     const animationFrameRef = useRef<number>();
     const [isLoading, setIsLoading] = useState(false)
+
+
 
     const fetchImages = async () => {
         try {
@@ -64,24 +73,10 @@ export default function ImageStream({ setTimestampMax }: { setTimestampMax: (tim
         }
     }
 
-    const fetchRandomTimestamp = async () => {
-        try {
-            
-            const response = await fetch(`/api/time`);
-            const data = await response.json();   
-            setCurrentTimestamp(data[0].timestamp)
-        } catch (error) {
-            console.error("Error fetching images:", error);
-        }
-    }
-
-    useEffect(() => {
-        console.log("currentTimestamp", currentTimestamp)
-    }, [currentTimestamp])
-
-
     const isRowLoaded = ({ index }: { index: number }) => {
+        
         const startIdx = index * IMAGES_PER_ROW;
+
         return !!images[startIdx];
     };
 
@@ -131,15 +126,22 @@ export default function ImageStream({ setTimestampMax }: { setTimestampMax: (tim
 
     // Modify the auto-scroll logic to use smooth scrolling
     const startAutoScroll = useCallback(() => {
-        const animate = () => {
+        let lastTime = performance.now();
+        
+        const animate = (currentTime: number) => {
+            const deltaTime = (currentTime - lastTime) / 1000; // Convert to seconds
+            lastTime = currentTime;
+            
             setScrollTop(prev => {
-                const newScrollTop = prev + SCROLL_SPEED;
+                const newScrollTop = prev + (scrollSpeed * deltaTime);
                 return newScrollTop;
             });
+            
             animationFrameRef.current = requestAnimationFrame(animate);
         };
-       requestAnimationFrame(animate);
-    }, []);
+        
+        requestAnimationFrame(animate);
+    }, [scrollSpeed]);
 
 
     const stopAutoScroll = () => {
@@ -151,7 +153,6 @@ export default function ImageStream({ setTimestampMax }: { setTimestampMax: (tim
     useEffect(() => {
         const initializeStream = async () => {
             if (!didInit.current) {
-                // await fetchRandomTimestamp();
                 await fetchImages();
                 startAutoScroll();
                 didInit.current = true;
@@ -170,6 +171,7 @@ export default function ImageStream({ setTimestampMax }: { setTimestampMax: (tim
                 isRowLoaded={isRowLoaded}
                 loadMoreRows={loadMoreRows}
                 rowCount={10000000000000}
+                threshold={40}
             >
                 {({ onRowsRendered, registerChild }: { onRowsRendered: (info: { startIndex: number; stopIndex: number }) => void; registerChild: (registeredChild: any) => void }) => (
                     <List

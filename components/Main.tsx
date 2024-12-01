@@ -8,10 +8,23 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { Icon } from '@clickhouse/click-ui'
 
+
+const DEFAULT_SCROLL_SPEED = 600
+
 export default function Main() {
 
     const [timestampMax, setTimestampMax] = useState<Date>()
     const [theme] = useState<ThemeName>('dark')
+
+
+    const getScrollSpeed = (): number => {
+        if (typeof window !== 'undefined') {
+            const params = new URLSearchParams(window.location.search);
+            const speed = params.get('speed');
+            return speed ? parseInt(speed) : DEFAULT_SCROLL_SPEED; // Default to 20 if not specified
+        }
+        return DEFAULT_SCROLL_SPEED;
+    };
 
     return (
         <ClickUIProvider theme={theme}>
@@ -27,7 +40,7 @@ export default function Main() {
                     </div>
                     <div className="flex-1 p-6 m-3 max-h-screen bg-[#262527]">
                         <h2 className="text-xl mb-14 pb-2 border-b border-white">Image Stream</h2>
-                        <ImageStream setTimestampMax={setTimestampMax} />
+                        <ImageStream setTimestampMax={setTimestampMax} scrollSpeed={getScrollSpeed()} />
                     </div>
                 </div>
             </div>
