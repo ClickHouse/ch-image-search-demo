@@ -34,7 +34,7 @@ const AnimatedRow = ({ children, style }: {
 
 export default function ImageStream({ 
     setTimestampMax, 
-    scrollSpeed: DEFAULT_SCROLL_SPEED
+    scrollSpeed = DEFAULT_SCROLL_SPEED
 }: { 
     setTimestampMax: (timestamp: Date) => void;
     scrollSpeed?: number;
