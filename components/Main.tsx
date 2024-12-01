@@ -9,7 +9,7 @@ import "slick-carousel/slick/slick-theme.css";
 import { Icon } from '@clickhouse/click-ui'
 
 
-const DEFAULT_SCROLL_SPEED = 600
+export const DEFAULT_SCROLL_SPEED = 600
 
 export default function Main() {
 

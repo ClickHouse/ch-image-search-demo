@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { InfiniteLoader, List } from "react-virtualized";
+import { DEFAULT_SCROLL_SPEED } from "./Main";
 
 interface StreamedImage {
 
@@ -33,7 +34,7 @@ const AnimatedRow = ({ children, style }: {
 
 export default function ImageStream({ 
     setTimestampMax, 
-    scrollSpeed
+    scrollSpeed: DEFAULT_SCROLL_SPEED
 }: { 
     setTimestampMax: (timestamp: Date) => void;
     scrollSpeed?: number;
